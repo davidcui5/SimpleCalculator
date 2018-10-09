@@ -7,6 +7,24 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <!-- row 0 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5">
+
+        <TextView
+            android:id="@+id/memoryScreen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="10sp"
+            android:typeface="serif" />
+    </LinearLayout>
+
     <!-- row 1 -->
     <LinearLayout
         android:layout_width="match_parent"
