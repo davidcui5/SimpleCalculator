@@ -16,7 +16,7 @@
         <TextView
             android:id="@+id/memoryScreen"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="start"
             android:maxLines="1"
             android:padding="10dp"
@@ -34,7 +34,7 @@
         <TextView
             android:id="@+id/inputOutputScreen"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="end"
             android:maxLines="1"
             android:padding="10dp"
