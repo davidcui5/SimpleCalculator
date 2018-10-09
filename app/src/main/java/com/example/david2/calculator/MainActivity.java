@@ -7,18 +7,18 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.objecthunter.exp4j.Expression;
-import net.objecthunter.exp4j.ExpressionBuilder;
+import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String currentInput = "0";
-    private int currentNumDigits = 1;
-    private String previousInputs = "";
-    private String inputToDisplay = "";
+    private final int MAX_DIGITS = 10;
+    private final double ALMOST_ZERO = 0.0000000000001;
 
-    private TextView inputScreen;
-    private TextView outputScreen;
+    private String currentOperand = "0";
+    private int currentNumDigits = 1;
+    private String previousOperand = "";
+
+    private TextView inputOutputScreen;
     private TextView memoryScreen;
 
     private Double memory = 0d;
@@ -28,19 +28,21 @@ public class MainActivity extends AppCompatActivity {
     private Button btnMC, btnMAdd, btnMSub, btnMR;
     private Button btnClear, btnSign, btnDecimal, btnEqual;
 
-    private boolean hasOperator = false;
+    private String operator = null;
     private boolean lastIsOperator = false;
-    private boolean lastIsMR = false;
     private boolean lastIsEqual = false;
+    private boolean lastIsMR = false;
+
+    private DecimalFormat dfScientific = new DecimalFormat("0.#########E0");
+    private DecimalFormat dfNormal = new DecimalFormat("0.#########");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        inputScreen = findViewById(R.id.inputScreen);
-        inputScreen.setText("0");
-        outputScreen = findViewById(R.id.outputScreen);
+        inputOutputScreen = findViewById(R.id.inputOutputScreen);
+        inputOutputScreen.setText("0");
         memoryScreen = findViewById(R.id.memoryScreen);
         memoryScreen.setText("M = 0");
         btnMC = findViewById(R.id.btnMC);
@@ -67,36 +69,32 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Button btnNum = (Button) v;
-                lastIsOperator = false;
-                if(currentNumDigits == 10) {
+                if(lastIsOperator || lastIsEqual || lastIsMR) {
+                    currentOperand = btnNum.getText().toString();
+                    currentNumDigits = 1;
+                    lastIsOperator = false;
+                    lastIsEqual = false;
+                    lastIsMR = false;
+                } else if(currentNumDigits == MAX_DIGITS) {
                     Toast.makeText(MainActivity.this, "Only 10 digits can be entered.", Toast.LENGTH_SHORT).show();
                     return;
-                }
-                if(lastIsMR) {
-                    lastIsMR = false;
-                    currentInput = btnNum.getText().toString();
-                    currentNumDigits = 1;
                 } else {
-                    switch (currentInput) {
+                    switch (currentOperand) {
                         case "0":
-                            currentInput = btnNum.getText().toString();
+                            currentOperand = btnNum.getText().toString();
                             currentNumDigits = 1;
                             break;
                         case "-0":
-                            currentInput = "-" + btnNum.getText().toString();
+                            currentOperand = "-" + btnNum.getText().toString();
                             currentNumDigits = 1;
                             break;
                         default:
-                            currentInput += btnNum.getText().toString();
+                            currentOperand += btnNum.getText().toString();
                             currentNumDigits++;
                             break;
                     }
                 }
-                inputToDisplay = previousInputs + currentInput;
-                inputScreen.setText(inputToDisplay);
-                if(hasOperator) {
-                    outputScreen.setText(calculate());
-                }
+                inputOutputScreen.setText(currentOperand);
             }
         };
         for (int id : numberButtons) {
@@ -109,20 +107,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Button btnOp = (Button) v;
-                lastIsMR = false;
                 if(lastIsOperator) {
-                    previousInputs = previousInputs.substring(0, previousInputs.length() - 1)
-                            + btnOp.getText().toString();
+                    operator = btnOp.getText().toString();
                 } else {
-                    previousInputs += currentInput;
-                    previousInputs += btnOp.getText().toString();
-                    currentInput = "0";
-                    currentNumDigits = 1;
-                    inputToDisplay = previousInputs + currentInput;
-                    inputScreen.setText(inputToDisplay);
-                    outputScreen.setText("");
-                    hasOperator = true;
                     lastIsOperator = true;
+                    if(operator == null) {
+                        operator = btnOp.getText().toString();
+                    } else {
+                        String result = calculate();
+                        currentOperand = result;
+                        inputOutputScreen.setText(result);
+                        operator = btnOp.getText().toString();
+                    }
+                    previousOperand = currentOperand;
                 }
             }
         };
@@ -143,8 +140,13 @@ public class MainActivity extends AppCompatActivity {
         btnMAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                memory += Double.parseDouble(currentInput);
-                String memoryStr = "M = " + memory.toString();
+                if(operator != null && !lastIsOperator) {
+                    String result = calculate();
+                    currentOperand = result;
+                    inputOutputScreen.setText(result);
+                }
+                memory += Double.parseDouble(currentOperand);
+                String memoryStr = "M = " + removeTrailingZeros(memory);
                 memoryScreen.setText(memoryStr);
             }
         });
@@ -152,8 +154,13 @@ public class MainActivity extends AppCompatActivity {
         btnMSub.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                memory -= Double.parseDouble(currentInput);
-                String memoryStr = "M = " + memory.toString();
+                if(operator != null && !lastIsOperator) {
+                    String result = calculate();
+                    currentOperand = result;
+                    inputOutputScreen.setText(result);
+                }
+                memory -= Double.parseDouble(currentOperand);
+                String memoryStr = "M = " + removeTrailingZeros(memory);
                 memoryScreen.setText(memoryStr);
             }
         });
@@ -167,12 +174,8 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 lastIsMR = true;
-                currentInput = memory.toString();
-                inputToDisplay = previousInputs + currentInput;
-                inputScreen.setText(inputToDisplay);
-                if(hasOperator) {
-                    outputScreen.setText(calculate());
-                }
+                currentOperand = memory.toString();
+                inputOutputScreen.setText(currentOperand);
             }
         });
     }
@@ -181,15 +184,13 @@ public class MainActivity extends AppCompatActivity {
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currentInput = "0";
+                currentOperand = "0";
                 currentNumDigits = 1;
-                previousInputs = "";
-                inputToDisplay = "";
-                inputScreen.setText("0");
-                outputScreen.setText("");
+                previousOperand = "";
+                inputOutputScreen.setText("0");
                 memory = 0d;
                 memoryScreen.setText("M = 0");
-                hasOperator = false;
+                operator = null;
                 lastIsOperator = false;
                 lastIsMR = false;
                 lastIsEqual = false;
@@ -201,17 +202,16 @@ public class MainActivity extends AppCompatActivity {
         btnSign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                lastIsOperator = false;
-                if(currentInput.charAt(0)=='-'){
-                    currentInput = currentInput.substring(1,currentInput.length());
+                if(lastIsOperator) {
+                    currentOperand = "-0";
+                    currentNumDigits = 1;
+                    lastIsOperator = false;
+                } else if(currentOperand.charAt(0)=='-'){
+                    currentOperand = currentOperand.substring(1,currentOperand.length());
                 } else {
-                    currentInput = "-" + currentInput;
+                    currentOperand = "-" + currentOperand;
                 }
-                inputToDisplay = previousInputs + currentInput;
-                inputScreen.setText(inputToDisplay);
-                if(hasOperator) {
-                    outputScreen.setText(calculate());
-                }
+                inputOutputScreen.setText(currentOperand);
             }
         });
     }
@@ -221,22 +221,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 lastIsOperator = false;
-                if(currentInput.contains(".")) {
-                    return;
-                }
+
                 if(lastIsMR || lastIsEqual) {
                     lastIsMR = false;
                     lastIsEqual = false;
-                    currentInput = "0.";
+                    currentOperand = "0.";
                     currentNumDigits = 1;
+                } else if(currentOperand.contains(".")) {
+                    return;
                 } else {
-                    currentInput += ".";
+                    currentOperand += ".";
                 }
-                inputToDisplay = previousInputs + currentInput;
-                inputScreen.setText(inputToDisplay);
-                if(hasOperator) {
-                    outputScreen.setText(calculate());
-                }
+                inputOutputScreen.setText(currentOperand);
             }
         });
     }
@@ -245,26 +241,48 @@ public class MainActivity extends AppCompatActivity {
         btnEqual.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(hasOperator) {
+                lastIsOperator = false;
+                if(lastIsEqual) {
+                    return;
+                }
+                lastIsEqual = true;
+                if(operator != null) {
                     String result = calculate();
-                    currentInput = result;
-                    lastIsEqual = true;
-                    outputScreen.setText(result);
+                    currentOperand = result;
+                    inputOutputScreen.setText(result);
+                    operator = null;
                 }
             }
         });
     }
 
     private String calculate () {
-        String txt = inputScreen.getText().toString();
-        Expression expression = new ExpressionBuilder(txt).build();
-        try {
-            double result = expression.evaluate();
-            return Double.toString(result);
-        } catch (ArithmeticException ex) {
-            return "Error";
+        double result = 0;
+        switch (operator) {
+            case "+":
+                result = Double.parseDouble(previousOperand) + Double.parseDouble(currentOperand);
+                break;
+            case "-":
+                result = Double.parseDouble(previousOperand) - Double.parseDouble(currentOperand);
+                break;
+            case "*":
+                result = Double.parseDouble(previousOperand) * Double.parseDouble(currentOperand);
+                break;
+            case "/":
+                if(Double.parseDouble(currentOperand) == 0) {
+                    Toast.makeText(MainActivity.this, "Cannot divide by zero, please clear.", Toast.LENGTH_SHORT).show();
+                }
+                result = Double.parseDouble(previousOperand) / Double.parseDouble(currentOperand);
+                break;
         }
+        return removeTrailingZeros(result);
     }
 
-
+    private String removeTrailingZeros (Double d) {
+        if(d > 1E7 || d < 1E-3) {
+            return dfScientific.format(d);
+        } else {
+            return dfNormal.format(d);
+        }
+    }
 }

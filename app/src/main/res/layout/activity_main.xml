@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <!-- row 0 -->
+    <!-- row 1 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -17,29 +17,11 @@
             android:id="@+id/memoryScreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:gravity="start"
             android:maxLines="1"
             android:padding="10dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="10sp"
-            android:typeface="serif" />
-    </LinearLayout>
-
-    <!-- row 1 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <TextView
-            android:id="@+id/inputScreen"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:maxLines="1"
-            android:padding="10dp"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="40sp"
             android:typeface="serif" />
     </LinearLayout>
 
@@ -50,14 +32,14 @@
         android:layout_weight="1">
 
         <TextView
-            android:id="@+id/outputScreen"
+            android:id="@+id/inputOutputScreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="end"
             android:maxLines="1"
             android:padding="10dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="30sp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="40sp"
             android:typeface="serif" />
     </LinearLayout>
 
