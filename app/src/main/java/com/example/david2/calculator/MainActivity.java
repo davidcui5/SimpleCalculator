@@ -12,7 +12,12 @@ import java.text.DecimalFormat;
 public class MainActivity extends AppCompatActivity {
 
     private final int MAX_DIGITS = 10;
-    private final double ALMOST_ZERO = 0.0000000000001;
+    private final double LARGEST_10_DIGITS = 9999999999D;
+    private final double SMALLEST_10_DIGITS = 0.000000001D;
+    private final String ADD = "\u002b";
+    private final String SUBTRACT = "\u2212";
+    private final String MULTIPLY = "\u00D7";
+    private final String DIVIDE = "\u00F7";
 
     private String currentOperand = "0";
     private int currentNumDigits = 1;
@@ -174,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 lastIsMR = true;
-                currentOperand = memory.toString();
+                currentOperand = removeTrailingZeros(memory);
                 inputOutputScreen.setText(currentOperand);
             }
         });
@@ -259,16 +264,16 @@ public class MainActivity extends AppCompatActivity {
     private String calculate () {
         double result = 0;
         switch (operator) {
-            case "+":
+            case ADD:
                 result = Double.parseDouble(previousOperand) + Double.parseDouble(currentOperand);
                 break;
-            case "-":
+            case SUBTRACT:
                 result = Double.parseDouble(previousOperand) - Double.parseDouble(currentOperand);
                 break;
-            case "*":
+            case MULTIPLY:
                 result = Double.parseDouble(previousOperand) * Double.parseDouble(currentOperand);
                 break;
-            case "/":
+            case DIVIDE:
                 if(Double.parseDouble(currentOperand) == 0) {
                     Toast.makeText(MainActivity.this, "Cannot divide by zero, please clear.", Toast.LENGTH_SHORT).show();
                 }
@@ -279,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String removeTrailingZeros (Double d) {
-        if(d > 1E7 || d < 1E-3) {
+        if(Math.abs(d) > LARGEST_10_DIGITS || (Math.abs(d) < SMALLEST_10_DIGITS && d > 0) ) {
             return dfScientific.format(d);
         } else {
             return dfNormal.format(d);

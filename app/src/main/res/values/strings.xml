@@ -11,11 +11,12 @@
     <string name="eight">8</string>
     <string name="nine">9</string>
     <string name="decimal">.</string>
-    <string name="sign">+/-</string>
-    <string name="add">+</string>
-    <string name="subtract">-</string>
-    <string name="multiply">*</string>
-    <string name="divide">/</string>
+    <!-->unicode for symbols<-->
+    <string name="sign">\u00b1</string>
+    <string name="add">\u002b</string>
+    <string name="subtract">\u2212</string>
+    <string name="multiply">\u00D7</string>
+    <string name="divide">\u00F7</string>
     <string name="equal">=</string>
     <string name="clear">C</string>
     <string name="clearMem">MC</string>
