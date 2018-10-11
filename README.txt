@@ -1,3 +1,5 @@
+By: David Cui B00788648
+
 # How to run
 
 To run the app, import it into Android Studio, 

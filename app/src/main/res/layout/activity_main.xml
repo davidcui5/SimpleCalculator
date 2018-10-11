@@ -8,6 +8,8 @@
     android:background="@color/colorSilver"
     tools:context=".MainActivity">
 
+    <!-- By: David Cui B00788648 -->
+
     <!-- row 1: memory screen -->
     <LinearLayout
         android:layout_width="match_parent"

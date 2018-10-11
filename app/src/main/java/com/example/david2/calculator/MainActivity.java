@@ -1,3 +1,5 @@
+// By: David Cui B00788648
+
 package com.example.david2.calculator;
 
 import android.support.v7.app.AppCompatActivity;
