@@ -12,8 +12,11 @@ I consulted these 2 calculators for wireframe idea and button color ideas:
 https://calculator-1.com/
 https://www.theonlinecalculator.com/
 
-I consulted some color code websites to get color codes:
+I consulted some websites to get color codes:
 https://en.wikipedia.org/wiki/Web_colors
 https://www.color-hex.com/color-names.html
 
-I also consulted the following tutorials for help:
+I also consulted the following tutorials for help and reference:
+http://innovativenetsolutions.com/2013/01/calculator-app/
+https://inducesmile.com/android/how-to-create-a-simple-android-calculator-application/
+https://www.javahelps.com/2015/03/android-simple-calculator.html

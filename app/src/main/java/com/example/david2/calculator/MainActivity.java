@@ -11,45 +11,48 @@ import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity {
 
+    //define max digits of input allowed
     private final int MAX_DIGITS = 10;
-    private final double LARGEST_10_DIGITS = 9999999999D;
-    private final double SMALLEST_10_DIGITS = 0.000000001D;
+    //unicode strings for math symbols, same as in strings.xml
     private final String ADD = "\u002b";
     private final String SUBTRACT = "\u2212";
     private final String MULTIPLY = "\u00D7";
     private final String DIVIDE = "\u00F7";
 
+    //current input number, is the right-side operand in calculation
     private String currentOperand = "0";
+    //count digits of input number
     private int currentNumDigits = 1;
+    //previous input number, is the left-side operand in calculation
     private String previousOperand = "";
-
-    private TextView inputOutputScreen;
-    private TextView memoryScreen;
-
-    private Double memory = 0d;
-
-    private int[] numberButtons = {R.id.btnZero, R.id.btnOne, R.id.btnTwo, R.id.btnThree, R.id.btnFour, R.id.btnFive, R.id.btnSix, R.id.btnSeven, R.id.btnEight, R.id.btnNine};
-    private int[] operatorButtons = {R.id.btnAdd, R.id.btnSubtract, R.id.btnMultiply, R.id.btnDivide};
-    private Button btnMC, btnMAdd, btnMSub, btnMR;
-    private Button btnClear, btnSign, btnDecimal, btnEqual;
-
+    //the math operator, + - * /
     private String operator = null;
+    private Double memory = 0d;
+    //booleans for last pressed button
     private boolean lastIsOperator = false;
     private boolean lastIsEqual = false;
     private boolean lastIsMR = false;
 
-    private DecimalFormat dfScientific = new DecimalFormat("0.#########E0");
-    private DecimalFormat dfNormal = new DecimalFormat("0.#########");
+    //UI elements, number buttons and operator buttons are accessed in array of IDs, because they share similar OnClickListeners
+    private TextView inputOutputScreen;
+    private TextView memoryScreen;
+    private TextView operatorScreen;
+    private int[] numberButtons = {R.id.btnZero, R.id.btnOne, R.id.btnTwo, R.id.btnThree, R.id.btnFour, R.id.btnFive, R.id.btnSix, R.id.btnSeven, R.id.btnEight, R.id.btnNine};
+    private int[] operatorButtons = {R.id.btnAdd, R.id.btnSubtract, R.id.btnMultiply, R.id.btnDivide};
+    private Button btnMC, btnMAdd, btnMSub, btnMR;
+    private Button btnClear, btnSign, btnDecimal, btnEqual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //link the UI elements
         inputOutputScreen = findViewById(R.id.inputOutputScreen);
         inputOutputScreen.setText("0");
         memoryScreen = findViewById(R.id.memoryScreen);
         memoryScreen.setText("M = 0");
+        operatorScreen = findViewById(R.id.operatorScreen);
         btnMC = findViewById(R.id.btnMC);
         btnMAdd = findViewById(R.id.btnMAdd);
         btnMSub = findViewById(R.id.btnMSub);
@@ -59,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         btnDecimal = findViewById(R.id.btnDecimal);
         btnEqual = findViewById(R.id.btnEqual);
 
+        //OnClickListeners defined in different methods
         setNumberOnClickListener();
         setOperatorOnClickListener();
         setMemoryOnClickListener();
@@ -70,20 +74,25 @@ public class MainActivity extends AppCompatActivity {
 
     //define and set OnClickListener for number buttons 0-9
     private void setNumberOnClickListener() {
+
         View.OnClickListener numberListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Button btnNum = (Button) v;
+                //after an operator or equal or memory read, input should be restarted by clicking a number
+                // so answer123456 doesn't happen
                 if(lastIsOperator || lastIsEqual || lastIsMR) {
                     currentOperand = btnNum.getText().toString();
                     currentNumDigits = 1;
                     lastIsOperator = false;
                     lastIsEqual = false;
                     lastIsMR = false;
-                } else if(currentNumDigits == MAX_DIGITS) {
+                } //not allow users to enter digits more than MAX_DIGITS
+                else if(currentNumDigits == MAX_DIGITS) {
                     Toast.makeText(MainActivity.this, "Only 10 digits can be entered.", Toast.LENGTH_SHORT).show();
                     return;
-                } else {
+                } //prevent users to enter 00000001, prevent leading zeros
+                else {
                     switch (currentOperand) {
                         case "0":
                             currentOperand = btnNum.getText().toString();
@@ -102,20 +111,27 @@ public class MainActivity extends AppCompatActivity {
                 inputOutputScreen.setText(currentOperand);
             }
         };
+        //set listener for all number buttons
         for (int id : numberButtons) {
             findViewById(id).setOnClickListener(numberListener);
         }
     }
 
+    //define and set OnClickListener for operators + - * /
     private void setOperatorOnClickListener() {
+
         View.OnClickListener operatorListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Button btnOp = (Button) v;
+                //prevents users enter consecutive operators
+                // consecutive operator replaces the previous operator
                 if(lastIsOperator) {
                     operator = btnOp.getText().toString();
                 } else {
                     lastIsOperator = true;
+                    //having a previous operator means users entered a op b op,
+                    // need to calculate a op b and displays it
                     if(operator == null) {
                         operator = btnOp.getText().toString();
                     } else {
@@ -124,16 +140,21 @@ public class MainActivity extends AppCompatActivity {
                         inputOutputScreen.setText(result);
                         operator = btnOp.getText().toString();
                     }
+                    //after entering operator, current operand becomes previous operand
                     previousOperand = currentOperand;
                 }
+                operatorScreen.setText(operator);
             }
         };
+        //set listener for all operator buttons
         for (int id : operatorButtons) {
             findViewById(id).setOnClickListener(operatorListener);
         }
     }
 
+    //for all 4 memory buttons
     private void setMemoryOnClickListener() {
+        //clear memory
         btnMC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,34 +163,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //add current displayed value to memory
         btnMAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(operator != null && !lastIsOperator) {
-                    String result = calculate();
-                    currentOperand = result;
-                    inputOutputScreen.setText(result);
-                }
                 memory += Double.parseDouble(currentOperand);
                 String memoryStr = "M = " + removeTrailingZeros(memory);
                 memoryScreen.setText(memoryStr);
             }
         });
 
+        //subtract current displayed value from memory
         btnMSub.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(operator != null && !lastIsOperator) {
-                    String result = calculate();
-                    currentOperand = result;
-                    inputOutputScreen.setText(result);
-                }
                 memory -= Double.parseDouble(currentOperand);
                 String memoryStr = "M = " + removeTrailingZeros(memory);
                 memoryScreen.setText(memoryStr);
             }
         });
 
+        //replace current value with memory value
+        // keep pressing MR, nothing happens
         btnMR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -185,6 +200,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //clear button, simply reset values to initial status
     private void setClearOnClickListener() {
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -196,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
                 memory = 0d;
                 memoryScreen.setText("M = 0");
                 operator = null;
+                operatorScreen.setText("");
                 lastIsOperator = false;
                 lastIsMR = false;
                 lastIsEqual = false;
@@ -203,6 +220,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Clicking sign button starts new input after an operator
+    // otherwise just flip the positive negative sign
+    // even if user just clicked equal or MR, should flip the sign without start new input
     private void setSignOnClickListener() {
         btnSign.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -221,18 +241,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //decimal point button
+    // similar to number buttons, decimal point restart input after operator, equal or MR
+    // also prevents more than 1 decimal point for any number
     private void setDecimalOnClickListener() {
         btnDecimal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                lastIsOperator = false;
-
-                if(lastIsMR || lastIsEqual) {
-                    lastIsMR = false;
+                if(lastIsOperator || lastIsEqual || lastIsMR) {
+                    lastIsOperator = false;
                     lastIsEqual = false;
+                    lastIsMR = false;
                     currentOperand = "0.";
                     currentNumDigits = 1;
                 } else if(currentOperand.contains(".")) {
+                    Toast.makeText(MainActivity.this, "Can only have 1 decimal point.", Toast.LENGTH_SHORT).show();
                     return;
                 } else {
                     currentOperand += ".";
@@ -242,27 +265,41 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //equal button
+    // prevent users from keep pressing equal button
+    // don't allow users to press equal without pressing an operator
+    // or right after operator
     private void setEqualOnClickListener() {
         btnEqual.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                lastIsOperator = false;
                 if(lastIsEqual) {
                     return;
                 }
-                lastIsEqual = true;
-                if(operator != null) {
-                    String result = calculate();
-                    currentOperand = result;
-                    inputOutputScreen.setText(result);
-                    operator = null;
+                if(operator == null) {
+                    Toast.makeText(MainActivity.this, "Please enter an operator.", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                if(lastIsOperator) {
+                    Toast.makeText(MainActivity.this, "Please enter a number or press MR.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                lastIsOperator = false;
+                lastIsMR = false;
+                lastIsEqual = true;
+                String result = calculate();
+                currentOperand = result;
+                inputOutputScreen.setText(result);
+                operator = null;
+                operatorScreen.setText("");
             }
         });
     }
 
+    //calculate: previous operand (operator) current operand
+    // deals with division by zero by showing message and NaN
     private String calculate () {
-        double result = 0;
+        double result = 0d;
         switch (operator) {
             case ADD:
                 result = Double.parseDouble(previousOperand) + Double.parseDouble(currentOperand);
@@ -276,6 +313,7 @@ public class MainActivity extends AppCompatActivity {
             case DIVIDE:
                 if(Double.parseDouble(currentOperand) == 0) {
                     Toast.makeText(MainActivity.this, "Cannot divide by zero, please clear.", Toast.LENGTH_SHORT).show();
+                    return "NaN";
                 }
                 result = Double.parseDouble(previousOperand) / Double.parseDouble(currentOperand);
                 break;
@@ -283,8 +321,16 @@ public class MainActivity extends AppCompatActivity {
         return removeTrailingZeros(result);
     }
 
+    //remove unwanted zeros present in double variables
+    // numbers with more than 10 digits are shown in scientific notation
     private String removeTrailingZeros (Double d) {
-        if(Math.abs(d) > LARGEST_10_DIGITS || (Math.abs(d) < SMALLEST_10_DIGITS && d > 0) ) {
+        //numbers with abs value larger than this are converted to scientific notation
+        double largestTenDigitsNum = 9999999999D;
+        //numbers with abs value between this and 0 are converted to scientific notation
+        double smallestTenDigitsNum = 0.000000001D;
+        DecimalFormat dfScientific = new DecimalFormat("0.#########E0");
+        DecimalFormat dfNormal = new DecimalFormat("0.#########");
+        if(Math.abs(d) > largestTenDigitsNum || (d > 0 && Math.abs(d) < smallestTenDigitsNum) ) {
             return dfScientific.format(d);
         } else {
             return dfNormal.format(d);
