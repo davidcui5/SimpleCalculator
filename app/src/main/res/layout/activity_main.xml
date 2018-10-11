@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:orientation="vertical"
-    android:background="@color/colorDark"
+    android:background="@color/colorSilver"
     tools:context=".MainActivity">
 
     <!-- row 1: memory screen -->
@@ -70,33 +70,37 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="30sp"
+            android:textSize="25sp"
             android:text="@string/clearMem"
-            android:backgroundTint="@color/colorLightSkyBlue"/>
+            android:textColor="@color/colorNavyBlue"
+            android:backgroundTint="@color/colorWhite"/>
         <Button
             android:id="@+id/btnMAdd"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="30sp"
+            android:textSize="25sp"
             android:text="@string/addToMem"
-            android:backgroundTint="@color/colorLightSkyBlue"/>
+            android:textColor="@color/colorNavyBlue"
+            android:backgroundTint="@color/colorWhite"/>
         <Button
             android:id="@+id/btnMSub"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="30sp"
+            android:textSize="25sp"
             android:text="@string/subtractFromMem"
-            android:backgroundTint="@color/colorLightSkyBlue"/>
+            android:textColor="@color/colorNavyBlue"
+            android:backgroundTint="@color/colorWhite"/>
         <Button
             android:id="@+id/btnMR"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="30sp"
+            android:textSize="25sp"
             android:text="@string/readMem"
-            android:backgroundTint="@color/colorLightSkyBlue"/>
+            android:textColor="@color/colorNavyBlue"
+            android:backgroundTint="@color/colorWhite"/>
     </LinearLayout>
 
     <!-- row 4 -->
@@ -112,7 +116,7 @@
             android:layout_weight="1"
             android:textSize="30sp"
             android:text="@string/clear"
-            android:textColor="@color/colorWhite"
+            android:textColor="@color/colorAliceBlue"
             android:backgroundTint="@color/colorRed"/>
         <Button
             android:id="@+id/btnSign"
@@ -121,7 +125,7 @@
             android:layout_weight="1"
             android:textSize="30sp"
             android:text="@string/sign"
-            android:backgroundTint="@color/colorSilver"/>
+            android:backgroundTint="@color/colorWhite"/>
         <Button
             android:id="@+id/btnDivide"
             android:layout_width="0dp"
@@ -129,7 +133,8 @@
             android:layout_weight="1"
             android:textSize="30sp"
             android:text="@string/divide"
-            android:backgroundTint="@color/colorGold"/>
+            android:textColor="@color/colorMidnightBlue"
+            android:backgroundTint="@color/colorLavender"/>
         <Button
             android:id="@+id/btnMultiply"
             android:layout_width="0dp"
@@ -137,7 +142,8 @@
             android:layout_weight="1"
             android:textSize="30sp"
             android:text="@string/multiply"
-            android:backgroundTint="@color/colorGold"/>
+            android:textColor="@color/colorMidnightBlue"
+            android:backgroundTint="@color/colorLavender"/>
     </LinearLayout>
 
     <!-- row 5 -->
@@ -177,7 +183,8 @@
             android:layout_weight="1"
             android:textSize="30sp"
             android:text="@string/subtract"
-            android:backgroundTint="@color/colorGold"/>
+            android:textColor="@color/colorMidnightBlue"
+            android:backgroundTint="@color/colorLavender"/>
     </LinearLayout>
     
     <!-- row 6 -->
@@ -216,8 +223,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:textSize="30sp"
+            android:textColor="@color/colorMidnightBlue"
             android:text="@string/add"
-            android:backgroundTint="@color/colorGold"/>
+            android:backgroundTint="@color/colorLavender"/>
     </LinearLayout>
 
     <!-- row 7 and 8 -->
@@ -286,7 +294,7 @@
                     android:layout_weight="1"
                     android:textSize="30sp"
                     android:text="@string/decimal"
-                    android:backgroundTint="@color/colorSilver"/>
+                    android:backgroundTint="@color/colorWhite"/>
             </LinearLayout>
         </LinearLayout>
 
@@ -299,6 +307,6 @@
             android:textSize="30sp"
             android:text="@string/equal"
             android:textColor="@color/colorWhite"
-            android:backgroundTint="@color/colorRoyalBlue"/>
+            android:backgroundTint="@color/colorMidnightBlue"/>
     </LinearLayout>
 </LinearLayout>
